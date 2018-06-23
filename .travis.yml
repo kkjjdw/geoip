@@ -1,0 +1,13 @@
+dist: trusty
+sudo: false
+
+language: go
+
+script:
+  - cd /tmp
+  - curl -kL https://github.com/phuslu/geoip/raw/master/ci.sh | bash -xe
+
+branches:
+  only:
+    - master
+
