@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net"
 	"testing"
+	"time"
 )
 
 func TestGeoIpCountry(t *testing.T) {
@@ -27,6 +28,7 @@ func TestGeoIpCountry(t *testing.T) {
 		{"23.16.28.232", "CA"},
 		{"58.240.115.210", "CN"},
 		{"61.155.4.66", "CN"},
+		{"255.255.255.255", "ZZ"},
 	}
 
 	for _, c := range cases {
@@ -39,15 +41,24 @@ func TestGeoIpCountry(t *testing.T) {
 }
 
 func BenchmarkGeoIpCountryByIPInt(b *testing.B) {
+	rand.Seed(time.Now().UnixNano())
+	ip := rand.Uint32()
+
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		CountryByIPInt(rand.Uint32())
+		CountryByIPInt(ip)
 	}
 }
 
 func BenchmarkGeoIpCountry(b *testing.B) {
+	rand.Seed(time.Now().UnixNano())
 	ip := make([]byte, 4)
+	binary.LittleEndian.PutUint32(ip[0:], rand.Uint32())
+
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		binary.LittleEndian.PutUint32(ip[0:], rand.Uint32())
 		Country(net.IP(ip))
 	}
 }

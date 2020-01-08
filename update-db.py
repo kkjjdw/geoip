@@ -18,17 +18,24 @@ def download():
 
 def generate(filename):
     """generate geoip_db.go"""
+    ips, geo = [], []
+    for line in open(filename):
+        parts = line.strip().split(',')
+        ip = parts[0].strip('"')
+        country = parts[2].strip('"')
+        if country == '-':
+            country = 'ZZ'
+        ips.append(ip)
+        geo.append(country)
     with open('geoip_db.go', 'wb') as file:
-        file.write(b'package geoip\n\nvar db = []byte("')
-        for line in open(filename):
-            parts = line.strip().split(',')
-            ip_str = ''.join('\\x%02x' % x for x in struct.pack('>I', int(parts[0].strip('"'))))
-            country = parts[2].strip('"')
-            if country == '-':
-                country = 'ZZ'
-            file.write((ip_str + country).encode())
-        file.write(b'")\n')
+        file.write(('''package geoip
+
+var ips = []uint32{%s}
+var geo = []byte("%s")
+
+''' % (','.join(ips), ''.join(geo))).encode())
 
 
 if __name__ == '__main__':
     generate(download())
+

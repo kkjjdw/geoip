@@ -2,8 +2,24 @@
 
 [![GoDoc](https://godoc.org/github.com/phuslu/geoip?status.svg)](http://godoc.org/github.com/phuslu/geoip)
 
-# Benchmarks
+## Getting Started
+
+```go
+package main
+
+import (
+	"github.com/phuslu/geoip"
+)
+
+func main() {
+	println(string(geoip.CountryByIPStr("1.1.1.1")))
+}
+
+// Output: US
 ```
-BenchmarkGeoIpCountryByIPInt-2   	10000000	       148 ns/op
-BenchmarkGeoIpCountry-2          	10000000	       150 ns/op
+
+## Benchmarks
+```
+BenchmarkGeoIpCountryByIPInt-8   	19.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGeoIpCountry-8          	25.5 ns/op	       0 B/op	       0 allocs/op
 ```
