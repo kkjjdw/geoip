@@ -5,8 +5,6 @@ import (
 	"math/rand"
 	"net"
 	"testing"
-
-	"github.com/oschwald/geoip2-golang"
 )
 
 func TestGeoIpCountry(t *testing.T) {
@@ -14,8 +12,8 @@ func TestGeoIpCountry(t *testing.T) {
 		IP      string
 		Country string
 	}{
-		{"0.1.1.1", ""},
-		{"1.1.1.1", "AU"},
+		{"0.1.1.1", "ZZ"},
+		{"1.1.1.1", "US"},
 		{"121.229.143.64", "CN"},
 		{"122.96.43.186", "CN"},
 		{"123.249.20.198", "CN"},
@@ -54,18 +52,3 @@ func BenchmarkGeoIpCountry(b *testing.B) {
 	}
 }
 
-func BenchmarkMaxmindGolang(b *testing.B) {
-	db, err := geoip2.Open(`/usr/local/share/GeoIP/GeoIP2-Country.mmdb`)
-	if err != nil {
-		b.Fatalf("geoip2.Open() error: %+v", err)
-	}
-	defer db.Close()
-
-	b.ResetTimer()
-
-	ip := make([]byte, 4)
-	for i := 0; i < b.N; i++ {
-		binary.LittleEndian.PutUint32(ip[0:], rand.Uint32())
-		db.Country(net.IP(ip))
-	}
-}
