@@ -26,10 +26,10 @@ func CountryByIPStr(ipStr string) (country []byte) {
 
 // Find country of IP uint32 value
 func CountryByIPInt(ipInt uint32) (country []byte) {
-	i, j := 0, len(ranges)/6
+	i, j := 0, len(db)/6
 	for i < j {
 		h := int(uint(i+j) >> 1)
-		n := binary.BigEndian.Uint32(ranges[h*6 : h*6+4])
+		n := binary.BigEndian.Uint32(db[h*6 : h*6+4])
 		if n > ipInt {
 			j = h
 		} else {
@@ -41,7 +41,7 @@ func CountryByIPInt(ipInt uint32) (country []byte) {
 		return
 	}
 
-	country = ranges[i*6-2 : i*6]
+	country = db[i*6-2 : i*6]
 
 	return
 }
