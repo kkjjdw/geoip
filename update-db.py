@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 # pylint: disable=too-many-statements, line-too-long, W0703
 
-__version__ = '1.0'
-
-import os
-import struct
-
-
-def download():
-    """download ip2location country csv"""
-    assert os.system('rm -rf IP2LOCATION-LITE-DB1.CSV') == 0
-    assert os.system('curl http://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP >IP2LOCATION-LITE-DB1.CSV.ZIP') == 0, 'download ip2location database error'
-    assert os.system('unzip IP2LOCATION-LITE-DB1.CSV.ZIP') == 0, 'unzip ip2location database error'
-    assert os.system('rm -rf IP2LOCATION-LITE-DB1.CSV.ZIP LICENSE-CC-BY-SA-4.0.TXT README_LITE.TXT') == 0
-    return 'IP2LOCATION-LITE-DB1.CSV'
+import io
+import sys
+import urllib.request
+import zipfile
 
 
-def generate(filename):
-    """generate geoip_db.go"""
+def main():
+    """convert ip2location country csv to geoip_db.go"""
+    filename = 'http://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP'
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+    if filename.startswith(('http://', 'https://')):
+        file = io.BytesIO(urllib.request.urlopen(filename).read())
+    else:
+        file = open(filename, 'rb')
+    if filename.lower().endswith('.zip'):
+        text = zipfile.ZipFile(file).read('IP2LOCATION-LITE-DB1.CSV')
+    else:
+        text = file.read()
+    # generate geoip_db.go
     ips, geo = [], []
-    for line in open(filename):
-        parts = line.strip().split(',')
+    for line in io.BytesIO(text):
+        parts = line.strip().decode().split(',')
         ip = parts[0].strip('"')
         country = parts[2].strip('"')
         if country == '-':
@@ -32,10 +35,8 @@ def generate(filename):
 
 var ips = []uint32{%s}
 var geo = []byte("%s")
-
 ''' % (','.join(ips), ''.join(geo))).encode())
 
 
 if __name__ == '__main__':
-    generate(download())
-
+    main()
