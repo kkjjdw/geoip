@@ -2,7 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/phuslu/geoip?status.svg)](http://godoc.org/github.com/phuslu/geoip)
 
-## Getting Started
+### Getting Started
 
 ```go
 package main
@@ -18,8 +18,11 @@ func main() {
 // Output: US
 ```
 
-## Benchmarks
+### Benchmarks
 ```
 BenchmarkGeoIpCountryByIPInt-8   	19.6 ns/op	       0 B/op	       0 allocs/op
 BenchmarkGeoIpCountry-8          	25.5 ns/op	       0 B/op	       0 allocs/op
 ```
+
+### Acknowledgment
+This site or product includes IP2Location LITE data available from http://www.ip2location.com.
