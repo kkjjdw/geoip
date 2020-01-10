@@ -11,12 +11,22 @@ import (
 	"net"
 )
 
+type uint128 struct {
+	H, L uint64
+}
+
 // Find country of IP.
 func Country(ip net.IP) (country []byte) {
 	if ip == nil {
 		return
 	}
-	return country4(binary.BigEndian.Uint32(ip.To4()))
+	if ip4 := ip.To4(); ip4 != nil {
+		country = country4(binary.BigEndian.Uint32(ip4))
+	} else {
+		ip6 := uint128{binary.BigEndian.Uint64(ip), binary.BigEndian.Uint64(ip[8:])}
+		country = country6(ip6)
+	}
+	return
 }
 
 func country4(ipInt uint32) (country []byte) {
@@ -36,5 +46,10 @@ func country4(ipInt uint32) (country []byte) {
 
 	country = geo[i*2-2 : i*2]
 
+	return
+}
+
+func country6(ipInt uint128) (country []byte) {
+	country = []byte{'Z', 'Z'}
 	return
 }

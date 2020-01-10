@@ -29,6 +29,8 @@ func TestGeoIpCountry(t *testing.T) {
 		{"58.240.115.210", "CN"},
 		{"61.155.4.66", "CN"},
 		{"255.255.255.255", "ZZ"},
+		{"::", "ZZ"},
+		{"::1", "ZZ"},
 	}
 
 	for _, c := range cases {
