@@ -11,10 +11,6 @@ import (
 	"net"
 )
 
-type uint128 struct {
-	H, L uint64
-}
-
 // Find country of IP.
 func Country(ip net.IP) (country []byte) {
 	if ip == nil {
@@ -23,17 +19,16 @@ func Country(ip net.IP) (country []byte) {
 	if ip4 := ip.To4(); ip4 != nil {
 		country = country4(binary.BigEndian.Uint32(ip4))
 	} else {
-		ip6 := uint128{binary.BigEndian.Uint64(ip), binary.BigEndian.Uint64(ip[8:])}
-		country = country6(ip6)
+		country = country6(binary.BigEndian.Uint64(ip), binary.BigEndian.Uint64(ip[8:]))
 	}
 	return
 }
 
-func country4(ipInt uint32) (country []byte) {
+func country4(n uint32) (country []byte) {
 	i, j := 0, len(ips)
 	for i < j {
 		h := int(uint(i+j) >> 1)
-		if ips[h] <= ipInt {
+		if ips[h] <= n {
 			i = h + 1
 		} else {
 			j = h
@@ -49,7 +44,24 @@ func country4(ipInt uint32) (country []byte) {
 	return
 }
 
-func country6(ipInt uint128) (country []byte) {
-	country = []byte{'Z', 'Z'}
+func country6(high, low uint64) (country []byte) {
+	i, j := 0, len(ips6)/16
+	for i < j {
+		h := int(uint(i+j) >> 1)
+		hi := binary.BigEndian.Uint64(ips6[h*16:])
+		lo := binary.BigEndian.Uint64(ips6[h*16+8:])
+		if hi > high || (hi == high && lo > low) {
+			j = h
+		} else {
+			i = h + 1
+		}
+	}
+
+	if i == 0 {
+		return
+	}
+
+	country = geo6[i*2-2 : i*2]
+
 	return
 }

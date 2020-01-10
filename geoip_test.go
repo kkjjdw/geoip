@@ -29,8 +29,14 @@ func TestGeoIpCountry(t *testing.T) {
 		{"58.240.115.210", "CN"},
 		{"61.155.4.66", "CN"},
 		{"255.255.255.255", "ZZ"},
-		{"::", "ZZ"},
 		{"::1", "ZZ"},
+		{"::1", "ZZ"},
+		{"2620:0:2d0:200::7", "US"},
+		{"2400:3200::1", "CN"},
+		{"2400:da00::6666", "CN"},
+		{"240e:4c:4008::1", "CN"},
+		{"240C::6666", "CN"},
+		{"2001:dc7:1000::1", "CN"},
 	}
 
 	for _, c := range cases {
@@ -45,6 +51,17 @@ func BenchmarkGeoIpCountryForIPv4(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	ip := make([]byte, 4)
 	binary.LittleEndian.PutUint32(ip[0:], rand.Uint32())
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		Country(net.IP(ip))
+	}
+}
+
+func BenchmarkGeoIpCountryForIPv6(b *testing.B) {
+	rand.Seed(time.Now().UnixNano())
+	ip := net.ParseIP("2400:da00::6666")
 
 	b.ReportAllocs()
 	b.ResetTimer()

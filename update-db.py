@@ -55,15 +55,15 @@ def update6():
     else:
         text = file.read()
     # generate geoip_db.go
-    ips, geo = [], []
+    ips, geo = b'', ''
     for line in io.BytesIO(text):
         parts = line.strip().decode().split(',')
         ip = int(parts[0].strip('"'))
         country = parts[2].strip('"')
         if country == '-':
             country = 'ZZ'
-        ips += [struct.pack('>Q', ip >> 64), struct.pack('>Q', ip & 0xFFFFFFFFFFFFFFFF)]
-        geo += [country]
+        ips += struct.pack('>Q', ip >> 64) + struct.pack('>Q', ip & 0xFFFFFFFFFFFFFFFF)
+        geo += country
     with open('geoip_db6.go', 'wb') as file:
         file.write(('''package geoip
 
@@ -79,9 +79,9 @@ var ips6 = func() []byte {
     r, _ := zlib.NewReader(base64.NewDecoder(base64.StdEncoding, bytes.NewReader(ips6e)))
     b, _ := ioutil.ReadAll(r)
     return b
-}
+}()
 var geo6 = []byte("%s")
-''' % (base64.b64encode(zlib.compress(b','.join(ips))).decode(), ''.join(geo))).encode())
+''' % (base64.b64encode(zlib.compress(ips)).decode(), geo)).encode())
 
 
 if __name__ == '__main__':

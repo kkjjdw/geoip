@@ -22,6 +22,7 @@ func main() {
 ### Benchmarks
 ```
 BenchmarkGeoIpCountryForIPv4-4          22.1 ns/op             0 B/op          0 allocs/op
+BenchmarkGeoIpCountryForIPv6-8          70.8 ns/op             0 B/op          0 allocs/op
 ```
 
 ### Acknowledgment
