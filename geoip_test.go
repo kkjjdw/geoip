@@ -33,25 +33,13 @@ func TestGeoIpCountry(t *testing.T) {
 
 	for _, c := range cases {
 		country := Country(net.ParseIP(c.IP))
-		// t.Logf("Country(%#v) return \"%s\", expect %#v", c.IP, country, c.Country)
 		if string(country) != c.Country {
 			t.Errorf("Country(%#v) return \"%s\", expect %#v", c.IP, country, c.Country)
 		}
 	}
 }
 
-func BenchmarkGeoIpCountryByIPInt(b *testing.B) {
-	rand.Seed(time.Now().UnixNano())
-	ip := rand.Uint32()
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		CountryByIPInt(ip)
-	}
-}
-
-func BenchmarkGeoIpCountry(b *testing.B) {
+func BenchmarkGeoIpCountryForIPv4(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	ip := make([]byte, 4)
 	binary.LittleEndian.PutUint32(ip[0:], rand.Uint32())
@@ -62,4 +50,3 @@ func BenchmarkGeoIpCountry(b *testing.B) {
 		Country(net.IP(ip))
 	}
 }
-

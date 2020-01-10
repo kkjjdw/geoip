@@ -1,4 +1,4 @@
-// A pure Go interface to the free MaxMind GeoIP database.
+// A pure Go interface to the free IP2Location GeoIP database.
 //
 // eg.
 //
@@ -16,16 +16,10 @@ func Country(ip net.IP) (country []byte) {
 	if ip == nil {
 		return
 	}
-	return CountryByIPInt(binary.BigEndian.Uint32(ip.To4()))
+	return country4(binary.BigEndian.Uint32(ip.To4()))
 }
 
-// Find country of IP string
-func CountryByIPStr(ipStr string) (country []byte) {
-	return CountryByIPInt(newIPInt(ipStr))
-}
-
-// Find country of IP uint32 value
-func CountryByIPInt(ipInt uint32) (country []byte) {
+func country4(ipInt uint32) (country []byte) {
 	i, j := 0, len(ips)
 	for i < j {
 		h := int(uint(i+j) >> 1)
@@ -44,28 +38,3 @@ func CountryByIPInt(ipInt uint32) (country []byte) {
 
 	return
 }
-
-func newIPInt(ipStr string) uint32 {
-	var dots int
-	var i, j uint32
-	for _, c := range ipStr {
-		switch c {
-		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			j = j*10 + uint32(c-'0')
-		case '.':
-			if j >= 256 {
-				return 0
-			}
-			i = i*256 + j
-			j = 0
-			dots++
-		default:
-			return 0
-		}
-	}
-	if dots != 3 || j >= 256 {
-		return 0
-	}
-	return i*256 + j
-}
-

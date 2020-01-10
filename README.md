@@ -8,11 +8,12 @@
 package main
 
 import (
+	"net"
 	"github.com/phuslu/geoip"
 )
 
 func main() {
-	println(string(geoip.CountryByIPStr("1.1.1.1")))
+	println(string(geoip.Country(net.ParseIP("1.1.1.1"))))
 }
 
 // Output: US
@@ -20,8 +21,7 @@ func main() {
 
 ### Benchmarks
 ```
-BenchmarkGeoIpCountryByIPInt-8   	19.6 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGeoIpCountry-8          	25.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGeoIpCountryForIPv4-4          22.1 ns/op             0 B/op          0 allocs/op
 ```
 
 ### Acknowledgment
